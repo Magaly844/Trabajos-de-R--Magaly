@@ -41,10 +41,19 @@ The `echo: false` option disables the printing of code (only output is displayed
 1.  Tener un archivo en html llamado "index.html"
 1.  Hacer push al repositorio
 1.  Activar GitHub pages
+
 #modelo lineal
+
 ##importar base de datos
 ```{r}
-modelo <- lm(formula = lfa ~ bloque + geno + riego + riego*geno , dat = DATA_12)
+DATA_12 <- read.csv(file = "LA MOLINA 2014 POTATO WUE (FB) - fb.csv" , header = TRUE, sep = ",")
+```
+
+
+
+
+```{r}
+modelo <- lm(formula = lfa ~ bloque + geno + riego + riego*geno , data = DATA_12)
 
 anova(modelo)
 
