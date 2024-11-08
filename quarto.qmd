@@ -87,8 +87,31 @@ ggplot(fb, aes(x = factor(geno), y = lfa, fill = factor(riego))) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   ggtitle("Boxplot de LFA por Genotipo y Riego")
 ```
+# Modelo lineal mixto
+```{r}
+library(lme4)
 
- 
+library(lmerTest)
+
+model <- lme4::lmer(lfa ~ riego + geno + riego*geno + (1|bloque), data = fb)
+
+anova(model)
+plot(model)
+```
+```{r}
+ol <- boxplot(lfa ~ riego*geno, fb)
+ol
+```
+```{r}
+library(inti)
+
+model <- remove_outliers(data = fb
+                         , formula = lfa ~ riego + geno + riego*geno + (1|bloque)
+                         , plot_diag = T
+                         )
+model
+```
+
  ## comparación de medias usando library
  
 ```{r}
@@ -152,6 +175,66 @@ ggplot(mc, aes(x = geno, y = emmean, fill = riego)) +
   labs(x = "Variedad", y = "LFA", fill = "Riego") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+# Analisis multivariado
+```{r}
+str(fb)
+
+```
+## Correlacion 
+```{r}
+library(psych)
+fb %>% 
+  select_if(is.numeric) %>% 
+  dplyr::select(!c("block")) %>% 
+  pairs.panels(x = .
+               , hist.col="red"
+               , pch = 21
+               , stars = TRUE
+               , scale = FALSE
+               , lm = TRUE
+               )
+
+
+```
+## PCA: Analisis de componentes principales
+```{r}
+library(FactoMineR)
+
+mv <- fb %>% 
+  group_by(riego, geno) %>% 
+  summarise(across(where(is.numeric), ~ mean(., na.rm = TRUE))) %>% 
+  PCA(scale.unit = T, quali.sup = c(1:4), graph = F)
+
+
+p1 <- plot(mv
+     , choix="ind"
+     , habillage=1
+     , label = "ind"
+     )
+
+
+p2 <- plot(mv
+     , choix="var")
+
+list(p1, p2) %>% 
+  plot_grid(plotlist = ., nrow = 1)
+```
+
+``{r}
+str(fb)
+library(psych)
+
+fb %>% 
+  select_if(is.numeric) %>% 
+  dplyr::select(!c("block")) %>% 
+  pairs.panels(x = .
+               , hist.col="red"
+               , pch = 21
+               , stars = TRUE
+               , scale = FALSE
+               , lm = TRUE
+               )
 ```
 
 
